@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "puzzle_generator", "puzzle_generator\puzzle_generator.pyproj", "{B0EC42C6-7CBA-4F5C-B548-8212AD3887D9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B0EC42C6-7CBA-4F5C-B548-8212AD3887D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0EC42C6-7CBA-4F5C-B548-8212AD3887D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2935C149-E86D-4B59-9389-7AA4EA292B5B}
+	EndGlobalSection
+EndGlobal
