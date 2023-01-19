@@ -51,14 +51,14 @@ def draw_puzzle(shape_matrix,colour_matrix):
 
    
     puzzle=draw_sector(shape_matrix[1][0],colour_matrix[0][1],puzzle,200,0)
-    puzzle=draw_sector(shape_matrix[0][0],colour_matrix[1][1],puzzle,200,200)
-    puzzle=draw_sector(shape_matrix[0][0],colour_matrix[2][1],puzzle,200,400)
+    puzzle=draw_sector(shape_matrix[1][1],colour_matrix[1][1],puzzle,200,200)
+    puzzle=draw_sector(shape_matrix[1][2],colour_matrix[2][1],puzzle,200,400)
 
     #third colomn
 
    
-    puzzle=draw_sector(shape_matrix[0][0],colour_matrix[0][2],puzzle,400,0)
-    puzzle=draw_sector(shape_matrix[0][0],colour_matrix[1][2],puzzle,400,200)
+    puzzle=draw_sector(shape_matrix[2][0],colour_matrix[0][2],puzzle,400,0)
+    puzzle=draw_sector(shape_matrix[2][1],colour_matrix[1][2],puzzle,400,200)
 
     return puzzle
 
@@ -131,24 +131,6 @@ def colour_puzzles():
 
 
     puzzle=draw_puzzle(shape_matrix,colour_matrix)
-   
-
-    #draw puzzle
-    #puzzle = np.ones((600, 600, 3), np.uint8) * 255
-    #first colomn
-    #template=template_switch(shape_order[0],triangle_temp,circle_temp,square_temp)
-    #puzzle=draw_sector(template,0,0,puzzle,0,0,colour_matrix)
-    #puzzle=draw_sector(template,0,200,puzzle,0,1,colour_matrix)
-    #puzzle=draw_sector(template,0,400,puzzle,0,2,colour_matrix)
-    #second colomn
-    #template=template_switch(shape_order[1],triangle_temp,circle_temp,square_temp)
-    #puzzle=draw_sector(template,200,0,puzzle,1,0,colour_matrix)
-    #puzzle=draw_sector(template,200,200,puzzle,1,1,colour_matrix)
-    #puzzle=draw_sector(template,200,400,puzzle,1,2,colour_matrix)
-    ##third colomn
-    #template=template_switch(shape_order[2],triangle_temp,circle_temp,square_temp)
-    #puzzle=draw_sector(template,400,0,puzzle,2,0,colour_matrix)
-    #puzzle=draw_sector(template,400,200,puzzle,2,1,colour_matrix)
 
     cv2.imshow("image1",np.squeeze(puzzle))
     cv2.waitKey()
