@@ -22,18 +22,44 @@ def shift_right(colour_matrix):
 
 
 
-def draw_sector(template,x_offset,y_offset,puzzle,sect_x,sect_y,colour_matrix):
+def draw_sector(template,colour,puzzle,x_offset,y_offset):
     i=0
     j=0
     while(i<200):
         while(j<200):
             if template[i][j][0]==0 and template[i][j][1]==0 and template[i][j][2]==0:
-                puzzle[i+y_offset][j+x_offset]=colour_matrix[sect_y][sect_x]
+                puzzle[i+y_offset][j+x_offset]=colour
             else:
                 puzzle[i+y_offset][j+x_offset]=template[i][j]
             j+=1
         j=0
         i+=1
+    return puzzle
+
+def draw_puzzle(shape_matrix,colour_matrix):
+    puzzle = np.ones((600, 600, 3), np.uint8) * 255
+
+
+    #first colomn
+
+    
+    puzzle=draw_sector(shape_matrix[0][0],colour_matrix[0][0],puzzle,0,0)
+    puzzle=draw_sector(shape_matrix[0][1],colour_matrix[1][0],puzzle,0,200)
+    puzzle=draw_sector(shape_matrix[0][2],colour_matrix[2][0],puzzle,0,400)
+
+    #second colomn
+
+   
+    puzzle=draw_sector(shape_matrix[1][0],colour_matrix[0][1],puzzle,200,0)
+    puzzle=draw_sector(shape_matrix[0][0],colour_matrix[1][1],puzzle,200,200)
+    puzzle=draw_sector(shape_matrix[0][0],colour_matrix[2][1],puzzle,200,400)
+
+    #third colomn
+
+   
+    puzzle=draw_sector(shape_matrix[0][0],colour_matrix[0][2],puzzle,400,0)
+    puzzle=draw_sector(shape_matrix[0][0],colour_matrix[1][2],puzzle,400,200)
+
     return puzzle
 
 def template_switch(x,triangle_temp,circle_temp,square_temp):
@@ -50,8 +76,9 @@ def colour_puzzles():
     #red, yellow,green,cyan,blue and magenta in BGR 
 
 
-    #choose random order of colours
+    #choose random colour order
     colour_order=np.zeros([3,3])
+    
     x1=random.choice(colour_palette)
     colour_order[0]=x1
     while(1):
@@ -68,17 +95,7 @@ def colour_puzzles():
     colour_matrix=np.array([colour_order,colour_order,colour_order])
     shift_right(colour_matrix)
     
-
-    #choose random order of random shapes
-    shapes=[1,2,3]
-    shape_order=np.zeros(3)
-    x=random.choice(shapes)
-    shape_order[0]=x
-    shapes.remove(x)
-    x=random.choice(shapes)
-    shape_order[1]=x
-    shapes.remove(x)
-    shape_order[2]=shapes[0]
+   
 
     #create triangle template
     triangle_temp=np.ones((200,200,3),np.uint8)*255
@@ -96,24 +113,42 @@ def colour_puzzles():
     square_temp=np.ones((200,200,3),np.uint8)*255
     cv2.rectangle(square_temp,(50,50),(150,150),(0,0,0),-1)
 
+    #choose random order of random shapes
+    shapes=[triangle_temp,circle_temp,square_temp]
+    shape_order=random.sample(shapes,3)
+    
+     #create a shape matrix from the random chosen 
+    shape_matrix=np.ndarray((3,3,200,200,3))
+    i=0
+    j=0
+    while (i<3):
+        while (j<3):
+            shape_matrix[i][j]=shape_order[i]
+            j+=1
+        j=0
+        i+=1
+
+
+
+    puzzle=draw_puzzle(shape_matrix,colour_matrix)
    
 
     #draw puzzle
-    puzzle = np.ones((600, 600, 3), np.uint8) * 255
+    #puzzle = np.ones((600, 600, 3), np.uint8) * 255
     #first colomn
-    template=template_switch(shape_order[0],triangle_temp,circle_temp,square_temp)
-    puzzle=draw_sector(template,0,0,puzzle,0,0,colour_matrix)
-    puzzle=draw_sector(template,0,200,puzzle,0,1,colour_matrix)
-    puzzle=draw_sector(template,0,400,puzzle,0,2,colour_matrix)
+    #template=template_switch(shape_order[0],triangle_temp,circle_temp,square_temp)
+    #puzzle=draw_sector(template,0,0,puzzle,0,0,colour_matrix)
+    #puzzle=draw_sector(template,0,200,puzzle,0,1,colour_matrix)
+    #puzzle=draw_sector(template,0,400,puzzle,0,2,colour_matrix)
     #second colomn
-    template=template_switch(shape_order[1],triangle_temp,circle_temp,square_temp)
-    puzzle=draw_sector(template,200,0,puzzle,1,0,colour_matrix)
-    puzzle=draw_sector(template,200,200,puzzle,1,1,colour_matrix)
-    puzzle=draw_sector(template,200,400,puzzle,1,2,colour_matrix)
-    #third colomn
-    template=template_switch(shape_order[2],triangle_temp,circle_temp,square_temp)
-    puzzle=draw_sector(template,400,0,puzzle,2,0,colour_matrix)
-    puzzle=draw_sector(template,400,200,puzzle,2,1,colour_matrix)
+    #template=template_switch(shape_order[1],triangle_temp,circle_temp,square_temp)
+    #puzzle=draw_sector(template,200,0,puzzle,1,0,colour_matrix)
+    #puzzle=draw_sector(template,200,200,puzzle,1,1,colour_matrix)
+    #puzzle=draw_sector(template,200,400,puzzle,1,2,colour_matrix)
+    ##third colomn
+    #template=template_switch(shape_order[2],triangle_temp,circle_temp,square_temp)
+    #puzzle=draw_sector(template,400,0,puzzle,2,0,colour_matrix)
+    #puzzle=draw_sector(template,400,200,puzzle,2,1,colour_matrix)
 
     cv2.imshow("image1",np.squeeze(puzzle))
     cv2.waitKey()
