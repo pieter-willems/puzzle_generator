@@ -3,22 +3,56 @@ import numpy as np
 import random
 
 
-def shift_right(colour_matrix):
-    print("x1", colour_matrix[1][0])
-    print("x2", colour_matrix[2][0])
 
-    #second row
-    x=np.array([colour_matrix[1][0][0],colour_matrix[1][0][1],colour_matrix[1][0][2]]) #written like this so that the actual values are put in x and not just a pointer
+
+def shift_colours(colour_matrix):
+    temp=np.array([[0,0,0],[0,0,0],[0,0,0]])
+
+    #shift second row
+    i=0
+    while i<3:
+        temp[i]=colour_matrix[1][i]
+        i+=1
+    print(temp)
+    temp=np.roll(temp,-1,axis=0)
+    print(temp)
+    i=0
+    while i<3:
+        colour_matrix[1][i]=temp[i]
+        i+=1
+
+    #shift third row
+    temp=np.roll(temp,-1,axis=0)
+    i=0
+    while i<3:
+        colour_matrix[2][i]=temp[i]
+        i+=1
+
+def shift_shapes(shape_matrix):
+    temp=np.zeros((3,200,200,3))
+    
+    #shift second row
+    i=0
+    while(i<3):
+       
+        temp[i]=shape_matrix[i][1]
+        i+=1
+    temp=np.roll(temp,-1,axis=0)
    
-    colour_matrix[1][0]=colour_matrix[1][2]
-    colour_matrix[1][2]=colour_matrix[1][1]
-    colour_matrix[1][1]=x
-  
 
-    #third row
-    colour_matrix[2][0]=colour_matrix[2][1]
-    colour_matrix[2][1]=colour_matrix[2][2]
-    colour_matrix[2][2]=x
+    i=0
+    while i<3:
+        shape_matrix[i][1]=temp[i]
+        i+=1
+    
+    #shift third row
+    temp=np.roll(temp,-1,axis=0)
+    i=0
+    while i<3:
+        shape_matrix[i][2]=temp[i]
+        i+=1
+    
+
 
 
 
@@ -93,7 +127,7 @@ def colour_puzzles():
             break
     colour_order[2]=x3
     colour_matrix=np.array([colour_order,colour_order,colour_order])
-    shift_right(colour_matrix)
+    #shift_colours(colour_matrix)
     
    
 
@@ -117,7 +151,7 @@ def colour_puzzles():
     shapes=[triangle_temp,circle_temp,square_temp]
     shape_order=random.sample(shapes,3)
     
-     #create a shape matrix from the random chosen 
+     #create a shape matrix from randomly chosen shapes
     shape_matrix=np.ndarray((3,3,200,200,3))
     i=0
     j=0
@@ -127,8 +161,7 @@ def colour_puzzles():
             j+=1
         j=0
         i+=1
-
-
+    shift_shapes(shape_matrix)
 
     puzzle=draw_puzzle(shape_matrix,colour_matrix)
 
