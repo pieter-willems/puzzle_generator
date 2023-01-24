@@ -3,6 +3,16 @@ import numpy as np
 import random
 
 
+def selfmade_transpose(matrix):
+    temp=matrix.copy()
+    i=0
+    j=0
+    while(i<np.shape(matrix)[0]):
+        while(j<np.shape(matrix)[1]):
+            matrix[i][j]=temp[j][i]
+            j+=1
+        j=0
+        i+=1
 
 
 def shift_colours(colour_matrix):
@@ -161,10 +171,9 @@ def colour_puzzles():
             j+=1
         j=0
         i+=1
-    shift_shapes(shape_matrix)
 
     puzzle=draw_puzzle(shape_matrix,colour_matrix)
-
+    
     cv2.imshow("image1",np.squeeze(puzzle))
     cv2.waitKey()
 
