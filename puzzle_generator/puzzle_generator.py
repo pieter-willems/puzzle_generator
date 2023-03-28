@@ -5,12 +5,12 @@ import argparse
 import sys
 
 def selfmade_transpose(matrix):
-    temp=matrix.copy()
-    i=0
-    j=0
-    while(i<np.shape(matrix)[0]):
+    temp = matrix.copy()
+    i = 0
+    j = 0
+    while i<np.shape(matrix)[0]:
         while(j<np.shape(matrix)[1]):
-            matrix[i][j]=temp[j][i]
+            matrix[i][j]= temp[j][i]
             j+=1
         j=0
         i+=1
@@ -156,8 +156,64 @@ def build_puzzle(choices):
     square_temp=np.ones((200,200,3),np.uint8)*255
     cv2.rectangle(square_temp,(50,50),(150,150),(0,0,0),-1)
 
+    #create right triangle
+    right_triangle_temp=np.ones((200,200,3),np.uint8)*255
+    pt1=(50,50)
+    pt2=(50,150)
+    pt3=(150,150)
+    tri_points = np.array([pt1, pt2, pt3])
+    cv2.drawContours(right_triangle_temp, [tri_points], -1, (0, 0, 0), -1)
+
+    #create trapeze template
+    trapeze_temp = np.ones((200, 200, 3), np.uint8) * 255
+    pt1 = (65, 50)
+    pt2 = (135, 50)
+    pt3 = (175, 150)
+    pt4 = (25, 150)
+    quad_points = np.array([pt1, pt2, pt3, pt4])
+    cv2.drawContours(trapeze_temp, [quad_points], -1, (0, 0, 0), -1)
+
+    #create rhombus template
+    rhombus_temp = np.ones((200, 200, 3), np.uint8) * 255
+    pt1 = (100, 50)
+    pt2 = (150, 100)
+    pt3 = (100, 150)
+    pt4 = (50, 100)
+    quad_points = np.array([pt1, pt2, pt3, pt4])
+    cv2.drawContours(rhombus_temp, [quad_points], -1, (0, 0, 0), -1)
+
+    #create kite template
+    kite_temp = np.ones((200, 200, 3), np.uint8) * 255
+    pt1 = (100, 50)
+    pt2 = (150, 70)
+    pt3 = (100, 150)
+    pt4 = (50, 70)
+    quad_points = np.array([pt1, pt2, pt3, pt4])
+    cv2.drawContours(kite_temp, [quad_points], -1, (0, 0, 0), -1)
+
+    #create pentagon template
+    pentagon_temp = np.ones((200, 200, 3), np.uint8) * 255
+    pt1 = (100, 50)
+    pt2 = (150, 90)
+    pt3 = (130, 150)
+    pt4 = (70,150)
+    pt5 = (50, 90)
+    pent_points = np.array([pt1, pt2, pt3, pt4,pt5])
+    cv2.drawContours(pentagon_temp, [pent_points], -1, (0, 0, 0), -1)
+
+    #create hexagon template
+    hexagon_temp = np.ones((200, 200, 3), np.uint8) * 255
+    pt1 = (100, 50)
+    pt2 = (150, 76)
+    pt3 = (150, 124)
+    pt4 = (100, 150)
+    pt5 = (50, 124)
+    pt6 = (50, 76)
+    hex_points = np.array([pt1, pt2, pt3, pt4, pt5,pt6])
+    cv2.drawContours(hexagon_temp, [hex_points], -1, (0, 0, 0), -1)
+
     #choose random order of random shapes
-    shapes=[triangle_temp,circle_temp,square_temp]
+    shapes=[triangle_temp, circle_temp, hexagon_temp, pentagon_temp, square_temp, right_triangle_temp, trapeze_temp, rhombus_temp, kite_temp]
     shape_order=random.sample(shapes,3)
     
     #create a shape matrix from randomly chosen shapes
