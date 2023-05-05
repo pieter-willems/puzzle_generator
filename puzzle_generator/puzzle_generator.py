@@ -3,6 +3,15 @@ import numpy as np
 import random
 import argparse
 import sys
+import csv
+import os
+
+def resolve_shape(shape_matrix,shapes):
+    i=0
+    while i<3:
+        if np.equal(shapes[i][1],shape_matrix[2][2]).all():
+            return shapes[i][0]
+        i+=1
 
 def selfmade_transpose(matrix):
     temp = matrix.copy()
@@ -213,8 +222,21 @@ def build_puzzle(choices):
     cv2.drawContours(hexagon_temp, [hex_points], -1, (0, 0, 0), -1)
 
     #choose random order of random shapes
-    shapes=[triangle_temp, circle_temp, hexagon_temp, pentagon_temp, square_temp, right_triangle_temp, trapeze_temp, rhombus_temp, kite_temp]
-    shape_order=random.sample(shapes,3)
+    shapes=[["triangle",triangle_temp],
+             ["circle",circle_temp],
+             ["hexagon",hexagon_temp],
+             ["pentagon",pentagon_temp],
+             ["square",square_temp],
+             ["right_triangle",right_triangle_temp],
+             ["trapeze",trapeze_temp],
+             ["rhombus",rhombus_temp],
+             ["kite",kite_temp]]
+    shapes=random.sample(shapes,3)
+    shape_order=[]
+    i=0
+    while i<3:
+        shape_order.append(shapes[i][1])
+        i+=1
     
     #create a shape matrix from randomly chosen shapes
     shape_matrix=np.ndarray((3,3,200,200,3))
@@ -259,9 +281,9 @@ def build_puzzle(choices):
         if(bool(random.getrandbits(1))):
             selfmade_transpose(shape_matrix)
     puzzle=draw_puzzle(shape_matrix,colour_matrix)
-    
-    cv2.imshow("image1",np.squeeze(puzzle))
-    cv2.waitKey()
+    shape_name=resolve_shape(shape_matrix,shapes)
+
+    return [puzzle,shape_name]
 
 def main():
     #parser for user arguments
@@ -280,7 +302,23 @@ def main():
         print(len(sys.argv))
     parsed_args=parser.parse_args()
     print(parsed_args)
-    build_puzzle(parsed_args)
+
+    #number of puzzles we want to store
+    n=100
+    print(os.getcwd())
+    os.makedirs("./dataset/images")
+    with open('./dataset/labels.csv', 'w') as csv_file:
+        fieldnames = ["image_name", "shape"]
+
+        csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        csv_writer.writeheader()
+        i = 0
+        while i < n:
+            puzzle, shape_name = build_puzzle(parsed_args)
+            image_name = "puzzle_" + str(i) + ".png"
+            cv2.imwrite("dataset/images/" + image_name, np.squeeze(puzzle))
+            csv_writer.writerow({"image_name": image_name, "shape": shape_name})
+            i += 1
 
 
 if __name__ == '__main__':
