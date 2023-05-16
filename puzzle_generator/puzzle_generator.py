@@ -303,22 +303,28 @@ def main():
     parsed_args=parser.parse_args()
     print(parsed_args)
 
-    #number of puzzles we want to store
-    n=100
-    print(os.getcwd())
-    os.makedirs("./dataset/images")
-    with open('./dataset/labels.csv', 'w') as csv_file:
-        fieldnames = ["image_name", "shape"]
+    puzzle, shape_name = build_puzzle(parsed_args)
 
-        csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-        csv_writer.writeheader()
-        i = 0
-        while i < n:
-            puzzle, shape_name = build_puzzle(parsed_args)
-            image_name = "puzzle_" + str(i) + ".png"
-            cv2.imwrite("dataset/images/" + image_name, np.squeeze(puzzle))
-            csv_writer.writerow({"image_name": image_name, "shape": shape_name})
-            i += 1
+    cv2.imshow("puzzle",np.squeeze(puzzle))
+    print(shape_name)
+    cv2.waitKey()
+    # #number of puzzles we want to store
+    # n=100
+    # print(os.getcwd())
+    # os.makedirs("./dataset/images")
+    # with open('./dataset/labels.csv', 'w') as csv_file:
+    #     fieldnames = ["image_name", "shape"]
+    #
+    #
+    #     csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+    #     csv_writer.writeheader()
+    #     i = 0
+    #     while i < n:
+    #         puzzle, shape_name = build_puzzle(parsed_args)
+    #         image_name = "puzzle_" + str(i) + ".png"
+    #         cv2.imwrite("dataset/images/" + image_name, np.squeeze(puzzle))
+    #         csv_writer.writerow({"image_name": image_name, "shape": shape_name})
+    #         i += 1
 
 
 if __name__ == '__main__':
