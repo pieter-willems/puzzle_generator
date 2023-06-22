@@ -11,34 +11,39 @@ def cut_puzzle(puzzle):
     return [tl,tr,bl]
 
 def create_cut_sub_dataset(name,amount,starting_number):
-    with open('./simple_puzzle_dataset/' + name + '.csv', 'w') as csv_file:
-        fieldnames = ["top_left","top_right","bottom_left","shape"]
+    with open('./simple_puzzle_dataset_test/' + name + '.csv', 'w') as csv_file:
+        fieldnames = ["top_left","top_right","bottom_left","solution_topleft","solution_topright","solution_bottomleft"]
         csv_writer= csv.DictWriter(csv_file, fieldnames=fieldnames)
         csv_writer.writeheader()
         i = starting_number
         while i < starting_number + amount:
-            at_sample = i-starting_number+1
-            if at_sample % 25 == 0:
-                print(f"\rAt sample {at_sample} of {amount}...", end='', flush=True)
             puzzle, shape_name = build_puzzle()
+            tl_shape=shape_name[0]
+            tr_shape = shape_name[1]
+            bl_shape = shape_name[2]
+
             tl,tr,bl=cut_puzzle(puzzle)
             tl_img = "puzzle_" + str(i) + "_tl"
             tr_img= "puzzle_" + str(i) + "_tr"
             bl_img= "puzzle_" + str(i) + "_bl"
-            cv2.imwrite("simple_puzzle_dataset/images/" + tl_img + ".png", np.squeeze(tl))
-            cv2.imwrite("simple_puzzle_dataset/images/" + tr_img + ".png", np.squeeze(tr))
-            cv2.imwrite("simple_puzzle_dataset/images/" + bl_img + ".png", np.squeeze(bl))
-            csv_writer.writerow({"top_left": tl_img,"top_right": tr_img,"bottom_left":bl_img, "shape": shape_name})
+            cv2.imwrite("simple_puzzle_dataset_test/images/" + tl_img + ".png", np.squeeze(tl))
+            cv2.imwrite("simple_puzzle_dataset_test/images/" + tr_img + ".png", np.squeeze(tr))
+            cv2.imwrite("simple_puzzle_dataset_test/images/" + bl_img + ".png", np.squeeze(bl))
+            csv_writer.writerow({"top_left": tl_img,"top_right": tr_img,"bottom_left":bl_img, "solution_topleft": tl_shape, "solution_topright": tr_shape, "solution_bottomleft": bl_shape})
             i += 1
-        print(f"\rAt sample {at_sample} of {amount}...", end='', flush=True)
-
-
 def resolve_shape(shape_matrix,shapes):
     i=0
+    list=[]
     while i<2:
-        if np.equal(shapes[i][1],shape_matrix[1][1]).all():
-            return shapes[i][0]
+        j=0
+        while j<2:
+            if np.equal(shapes[0][1],shape_matrix[j][i]).all():
+                list.append(shapes[0][0])
+            else:
+                list.append(shapes[1][0])
+            j+=1
         i+=1
+    return list
 def shift_colours(colour_matrix,shift):
     temp=np.array([[0,0,0],[0,0,0]])
 
@@ -235,9 +240,9 @@ def build_puzzle():
 
 
 def main():
-    os.makedirs("./simple_puzzle_dataset/images")
-    amount_examples_train_dataset = 800
-    amount_examples_test_dataset = 200
+    os.makedirs("./simple_puzzle_dataset_test/images")
+    amount_examples_train_dataset = 80
+    amount_examples_test_dataset = 20
     create_cut_sub_dataset('train', amount_examples_train_dataset, 0)
     create_cut_sub_dataset('test', amount_examples_test_dataset, amount_examples_train_dataset)
 

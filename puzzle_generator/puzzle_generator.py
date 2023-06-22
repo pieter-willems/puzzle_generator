@@ -6,6 +6,70 @@ import sys
 import csv
 import os
 
+def create_cut_sub_dataset(name,amount,starting_number,parsed_args):
+    with open('./dataset/' + name + '.csv', 'w') as csv_file:
+        fieldnames = ["top_left","top_middle","top_right","middle_left","middle_middle","middle_right",
+                      "bottom_left","bottom_middle","shape","colour"]
+        csv_writer= csv.DictWriter(csv_file, fieldnames=fieldnames)
+        csv_writer.writeheader()
+        i = starting_number
+        while i < starting_number + amount:
+            at_sample = i-starting_number+1
+            if at_sample % 25 == 0:
+                print(f"\rAt sample {at_sample} of {amount}...", end='', flush=True)
+            puzzle, shape_name,colour_name = build_puzzle(parsed_args)
+            tl,tm,tr,ml,mm,mr,bl,bm=cut_puzzle(puzzle)
+
+            tl_img = "puzzle_" + str(i) + "_tl"
+            tm_img = "puzzle_" + str(i) + "_tm"
+            tr_img= "puzzle_" + str(i) + "_tr"
+
+            ml_img = "puzzle_" + str(i) + "_ml"
+            mm_img = "puzzle_" + str(i) + "_mm"
+            mr_img = "puzzle_" + str(i) + "_mr"
+
+            bl_img= "puzzle_" + str(i) + "_bl"
+            bm_img = "puzzle_" + str(i) + "_bm"
+
+            cv2.imwrite("dataset/images/" + tl_img + ".png", np.squeeze(tl))
+            cv2.imwrite("dataset/images/" + tm_img + ".png", np.squeeze(tm))
+            cv2.imwrite("dataset/images/" + tr_img + ".png", np.squeeze(tr))
+
+            cv2.imwrite("dataset/images/" + ml_img + ".png", np.squeeze(ml))
+            cv2.imwrite("dataset/images/" + mm_img + ".png", np.squeeze(mm))
+            cv2.imwrite("dataset/images/" + mr_img + ".png", np.squeeze(mr))
+
+            cv2.imwrite("dataset/images/" + bl_img + ".png", np.squeeze(bl))
+            cv2.imwrite("dataset/images/" + bm_img + ".png", np.squeeze(bm))
+
+            csv_writer.writerow({"top_left": tl_img,"top_middle": tm_img, "top_right": tr_img,
+                                 "middle_left" : ml_img,"middle_middle" : mm_img,"middle_right" : ml_img,
+                                 "bottom_left" : bl_img, "bottom_middle" : bm_img,
+                                "shape": shape_name, "colour" : colour_name})
+            i += 1
+        print(f"\rAt sample {at_sample} of {amount}...", end='', flush=True)
+
+def cut_puzzle(puzzle):
+    tl = puzzle[0:200, 0:200]
+    tm = puzzle[0:200, 200:400]
+    tr = puzzle[0:200,400:600]
+    ml = puzzle[200:400, 0:200]
+    mm = puzzle[200:400, 200:400]
+    mr = puzzle[200:400, 400:600]
+    bl = puzzle[400:600, 0:200]
+    bm = puzzle[400:600, 200:400]
+    return [tl, tm,tr,ml,mm,mr,bl,bm]
+
+def resolve_colour(colour_matrix, colour, colour_palette):
+    if len (colour) == 1:
+        return colour[0]
+    else:
+        if np.equal(colour_palette.get(colour[0]), colour_matrix[2][2]).all():
+            return colour[0]
+        elif np.equal(colour_palette.get(colour[1]), colour_matrix[2][2]).all():
+            return colour[1]
+        else:
+            return colour[2]
 def resolve_shape(shape_matrix,shapes):
     i=0
     while i<3:
@@ -72,8 +136,6 @@ def shift_shapes(shape_matrix,shift):
     
 
 
-
-
 def draw_sector(template,colour,puzzle,x_offset,y_offset):
     i=0
     j=0
@@ -116,35 +178,50 @@ def draw_puzzle(shape_matrix,colour_matrix):
 
 
 def build_puzzle(choices):
-    colour_palette=np.array([[0,0,255],[0,255,255],[0,255,0],[255,255,0],[255,0,0],[255,0,255]])
-    #red, yellow,green,cyan,blue and magenta in BGR 
+    # colour_palette=np.array([[0,0,255],[0,255,255],[0,255,0],[255,255,0],[255,0,0],[255,0,255]])
+    # #red, yellow,green,cyan,blue and magenta in BGR
+    #
+    #
+    # #choose random colour order
+    # colour_order=np.zeros([3,3])
+    #
+    # x1=random.choice(colour_palette)
+    #
+    # #make the colour order one colour if chosen by user argument
+    # if(choices.one_colour):
+    #     colour_order[0]=x1
+    #     colour_order[1]=x1
+    #     colour_order[2]=x1
+    #
+    # #otherwise the colour order is random
+    # else:
+    #     colour_order[0]=x1
+    #     while(1):
+    #
+    #         x2=random.choice(colour_palette)
+    #         if np.array_equiv(x1,x2)==False:
+    #             break
+    #     colour_order[1]=x2
+    #     while(1):
+    #         x3=random.choice(colour_palette)
+    #         if np.array_equiv(x3,x1)==False and np.array_equiv(x3,x2)==False:
+    #             break
+    #     colour_order[2]=x3
 
 
-    #choose random colour order
-    colour_order=np.zeros([3,3])
-    
-    x1=random.choice(colour_palette)
-
-    #make the colour order one colour if chosen by user argument
-    if(choices.one_colour):
-        colour_order[0]=x1
-        colour_order[1]=x1
-        colour_order[2]=x1
-
-    #otherwise the colour order is random
+    colour_palette = {"red": [0, 0, 255], "yellow": [0, 255, 255], "green": [0, 255, 0]
+      #  , "cyan": [255, 255, 0],"blue": [255, 0, 0], "magenta": [255, 0, 255]
+                      }
+    x = random.randrange(2)
+    # one third of the time all the colours are the same
+    if x == 2:
+        colour = random.sample(colour_palette.keys(), 1)
+        colour_order = [colour_palette.get(colour[0]), colour_palette.get(colour[0]),colour_palette.get(colour[0])]
+    # two thirds of the time we have two random colours
     else:
-        colour_order[0]=x1
-        while(1):
-      
-            x2=random.choice(colour_palette)
-            if np.array_equiv(x1,x2)==False:
-                break
-        colour_order[1]=x2
-        while(1):
-            x3=random.choice(colour_palette)
-            if np.array_equiv(x3,x1)==False and np.array_equiv(x3,x2)==False:
-                break
-        colour_order[2]=x3
+        colour = random.sample(colour_palette.keys(), 3)
+        colour_order = [colour_palette.get(colour[0]), colour_palette.get(colour[1]),colour_palette.get(colour[2])]
+
 
     #create a 3x3 matrix of the chosen colours
     colour_matrix=np.array([colour_order,colour_order,colour_order])
@@ -224,13 +301,14 @@ def build_puzzle(choices):
     #choose random order of random shapes
     shapes=[["triangle",triangle_temp],
              ["circle",circle_temp],
-             ["hexagon",hexagon_temp],
-             ["pentagon",pentagon_temp],
-             ["square",square_temp],
-             ["right_triangle",right_triangle_temp],
-             ["trapeze",trapeze_temp],
-             ["rhombus",rhombus_temp],
-             ["kite",kite_temp]]
+             ["hexagon",hexagon_temp]
+             # ["pentagon",pentagon_temp],
+             # ["square",square_temp],
+             # ["right_triangle",right_triangle_temp],
+             # ["trapeze",trapeze_temp],
+             # ["rhombus",rhombus_temp],
+             # ["kite",kite_temp]
+            ]
     shapes=random.sample(shapes,3)
     shape_order=[]
     i=0
@@ -263,7 +341,6 @@ def build_puzzle(choices):
 
     #change colour and shape matrix based on choices
     if len(sys.argv)>1:
-        print("no")
         if choices.colourshift is not None and choices.one_colour is False:
             shift_colours(colour_matrix,choices.colourshift)
         if choices.shapeshift is not None and choices.one_shape is False:
@@ -273,7 +350,6 @@ def build_puzzle(choices):
         if choices.transpose_shapes:
             selfmade_transpose(shape_matrix)
     elif(not choices.one_colour and not choices.one_shape):
-        print("yes")
         shift_colours(colour_matrix,random.choice([-2,-1,0,1,2]))
         shift_shapes(shape_matrix,random.choice([-2,-1,0,1,2]))
         if(bool(random.getrandbits(1))):
@@ -282,10 +358,14 @@ def build_puzzle(choices):
             selfmade_transpose(shape_matrix)
     puzzle=draw_puzzle(shape_matrix,colour_matrix)
     shape_name=resolve_shape(shape_matrix,shapes)
+    colour_name = resolve_colour(colour_matrix,colour,colour_palette)
 
-    return [puzzle,shape_name]
+    return [puzzle,shape_name,colour_name]
 
 def main():
+
+    shape_dataset= False
+    colour_and_shape_dataset = True
     #parser for user arguments
     parser=argparse.ArgumentParser(description='choose what kind of random puzzles you want with the help of arguments. If none are given, they will be random.')
     parser.add_argument("--shift_colours",type=int,choices=[-2,-1,1,2],dest="colourshift",help="decide how the colours will be shifted in the puzzle. Negative values will shift to the left, positive values to the right.")
@@ -303,28 +383,34 @@ def main():
     parsed_args=parser.parse_args()
     print(parsed_args)
 
-    puzzle, shape_name = build_puzzle(parsed_args)
+    puzzle, shape_name, colour_name = build_puzzle(parsed_args)
+    cut_puzzle(puzzle)
 
-    cv2.imshow("puzzle",np.squeeze(puzzle))
-    print(shape_name)
-    cv2.waitKey()
-    # #number of puzzles we want to store
-    # n=100
-    # print(os.getcwd())
-    # os.makedirs("./dataset/images")
-    # with open('./dataset/labels.csv', 'w') as csv_file:
-    #     fieldnames = ["image_name", "shape"]
-    #
-    #
-    #     csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-    #     csv_writer.writeheader()
-    #     i = 0
-    #     while i < n:
-    #         puzzle, shape_name = build_puzzle(parsed_args)
-    #         image_name = "puzzle_" + str(i) + ".png"
-    #         cv2.imwrite("dataset/images/" + image_name, np.squeeze(puzzle))
-    #         csv_writer.writerow({"image_name": image_name, "shape": shape_name})
-    #         i += 1
+    if shape_dataset:
+        #number of puzzles we want to store
+        n=100
+        print(os.getcwd())
+        os.makedirs("./dataset/images")
+        with open('./dataset/labels.csv', 'w') as csv_file:
+            fieldnames = ["image_name", "shape"]
+
+
+            csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            csv_writer.writeheader()
+            i = 0
+            while i < n:
+                puzzle, shape_name = build_puzzle(parsed_args)
+                image_name = "puzzle_" + str(i) + ".png"
+                cv2.imwrite("dataset/images/" + image_name, np.squeeze(puzzle))
+                csv_writer.writerow({"image_name": image_name, "shape": shape_name})
+                i += 1
+    if colour_and_shape_dataset:
+        print(os.getcwd())
+        os.makedirs("./dataset/images")
+        amount_examples_train_dataset = 200
+        amount_examples_test_dataset = 50
+        create_cut_sub_dataset('train', amount_examples_train_dataset, 0,parsed_args)
+        create_cut_sub_dataset('test', amount_examples_test_dataset, amount_examples_train_dataset,parsed_args)
 
 
 if __name__ == '__main__':

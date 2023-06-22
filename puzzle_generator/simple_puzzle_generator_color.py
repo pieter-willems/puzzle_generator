@@ -12,7 +12,7 @@ def cut_puzzle(puzzle):
 
 def create_cut_sub_dataset(name,amount,starting_number):
     with open('./simple_puzzle_dataset/' + name + '.csv', 'w') as csv_file:
-        fieldnames = ["top_left","top_right","bottom_left","shape"]
+        fieldnames = ["top_left","top_right","bottom_left","colour"]
         csv_writer= csv.DictWriter(csv_file, fieldnames=fieldnames)
         csv_writer.writeheader()
         i = starting_number
@@ -20,7 +20,7 @@ def create_cut_sub_dataset(name,amount,starting_number):
             at_sample = i-starting_number+1
             if at_sample % 25 == 0:
                 print(f"\rAt sample {at_sample} of {amount}...", end='', flush=True)
-            puzzle, shape_name = build_puzzle()
+            puzzle, shape_name,colour_name = build_puzzle()
             tl,tr,bl=cut_puzzle(puzzle)
             tl_img = "puzzle_" + str(i) + "_tl"
             tr_img= "puzzle_" + str(i) + "_tr"
@@ -28,10 +28,18 @@ def create_cut_sub_dataset(name,amount,starting_number):
             cv2.imwrite("simple_puzzle_dataset/images/" + tl_img + ".png", np.squeeze(tl))
             cv2.imwrite("simple_puzzle_dataset/images/" + tr_img + ".png", np.squeeze(tr))
             cv2.imwrite("simple_puzzle_dataset/images/" + bl_img + ".png", np.squeeze(bl))
-            csv_writer.writerow({"top_left": tl_img,"top_right": tr_img,"bottom_left":bl_img, "shape": shape_name})
+            csv_writer.writerow({"top_left": tl_img,"top_right": tr_img,"bottom_left":bl_img, "colour": colour_name})
             i += 1
         print(f"\rAt sample {at_sample} of {amount}...", end='', flush=True)
 
+def resolve_colour(colour_matrix, colour, colour_palette):
+    if len (colour) == 1:
+        return colour[0]
+    else:
+        if np.equal(colour_palette.get(colour[0]), colour_matrix[1][1]).all():
+            return colour[0]
+        else:
+            return colour[1]
 
 def resolve_shape(shape_matrix,shapes):
     i=0
@@ -101,15 +109,18 @@ def draw_puzzle(shape_matrix, colour_matrix):
 
 
 def build_puzzle():
-    colour_palette=[[0,0,255],[0,255,255],[0,255,0],[255,255,0],[255,0,0],[255,0,255]]
+    colour_palette = {"red": [0,0,255], "yellow": [0,255,255],"green" : [0,255,0], "cyan":[255,255,0],
+                     "blue" : [255,0,0], "magenta": [255,0,255]}
+    #colour_palette=[[0,0,255],[0,255,255],[0,255,0],[255,255,0],[255,0,0],[255,0,255]]
     x=random.randrange(2)
     #one third of the time all the colours are the same
     if x==2:
-        colour=random.sample(colour_palette,1)
-        colour_order=[colour,colour]
+        colour=random.sample(colour_palette.keys(),1)
+        colour_order=[colour_palette.get(colour[0]),colour_palette.get(colour[0])]
     #two thirds of the time we have two random colours
     else:
-        colour_order= random.sample(colour_palette,2)
+        colour = random.sample(colour_palette.keys(),2)
+        colour_order = [colour_palette.get(colour[0]),colour_palette.get(colour[1])]
 
     colour_matrix = np.array([colour_order, colour_order])
 
@@ -202,7 +213,7 @@ def build_puzzle():
         shape_order.append(shapes[i][1])
         i += 1
     shape_matrix = np.ndarray((2, 2, 200, 200, 3))
-    x=random.randrange(2)
+    x = random.randrange(2)
 
     #one third of the time all the shapes are the same
     if x==2:
@@ -229,7 +240,8 @@ def build_puzzle():
     shift_shapes(shape_matrix, random.choice([ 0, 1]))
     puzzle = draw_puzzle(shape_matrix, colour_matrix)
     shape_name = resolve_shape(shape_matrix, shapes)
-    return [puzzle,shape_name]
+    colour_name = resolve_colour(colour_matrix,colour, colour_palette)
+    return [puzzle,shape_name,colour_name]
 
 
 
@@ -240,6 +252,7 @@ def main():
     amount_examples_test_dataset = 200
     create_cut_sub_dataset('train', amount_examples_train_dataset, 0)
     create_cut_sub_dataset('test', amount_examples_test_dataset, amount_examples_train_dataset)
+
 
 
 

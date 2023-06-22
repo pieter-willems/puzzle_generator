@@ -4,9 +4,9 @@ import cv2
 import numpy as np
 import csv
 
+c = 0
 
-
-def create_sub_dataset(name,amount,starting_number):
+def create_sub_dataset(name,amount,starting_number,count):
     with open('./test_puzzle_dataset/' + name + '.csv', 'w') as csv_file:
         fieldnames = ["image_name","shape"]
         csv_writer= csv.DictWriter(csv_file, fieldnames=fieldnames)
@@ -14,19 +14,21 @@ def create_sub_dataset(name,amount,starting_number):
         i = starting_number
         while i < starting_number + amount:
             puzzle, shape_name = generate_puzzle()
-            image_name = "puzzle_" + str(i)
-            cv2.imwrite("test_puzzle_dataset/images/" + image_name + ".png", np.squeeze(puzzle))
+            image_name = count
+            cv2.imwrite("test_puzzle_dataset/images/"  + str(image_name) + ".png", np.squeeze(puzzle))
             csv_writer.writerow({"image_name": image_name, "shape": shape_name})
+            count += 1
             i += 1
+        return count
 def draw_puzzle(puzzle,colour,shape):
     i = 0
     j = 0
     while (i < 200):
         while (j < 200):
-            if shape[i][j][0] == 0 and shape[i][j][1] == 0 and shape[i][j][2] == 0:
-                puzzle[i][j] = colour
-            else:
-                puzzle[i][j] = shape[i][j]
+            # if shape[i][j][0] == 0 and shape[i][j][1] == 0 and shape[i][j][2] == 0:
+            #     puzzle[i][j] = colour
+            # else:
+            puzzle[i][j] = shape[i][j]
             j += 1
         j = 0
         i += 1
@@ -37,7 +39,7 @@ def generate_puzzle():
     colour_palette = np.array([[0, 0, 255], [0, 255, 255], [0, 255, 0], [255, 255, 0], [255, 0, 0], [255, 0, 255]])
     # red, yellow,green,cyan,blue and magenta in BGR
 
-    colour= random.choice(colour_palette)
+    colour = random.choice(colour_palette)
 
     #shape section
     # create triangle template
@@ -113,16 +115,16 @@ def generate_puzzle():
     cv2.drawContours(hexagon_temp, [hex_points], -1, (0, 0, 0), -1)
 
     # choose random order of random shapes
-    shapes = [["triangle", triangle_temp],
-              ["circle", circle_temp],
-              ["hexagon", hexagon_temp],
-              ["pentagon", pentagon_temp],
-              ["square", square_temp],
-              ["right_triangle", right_triangle_temp],
-              ["trapeze", trapeze_temp],
-              ["rhombus", rhombus_temp],
-              ["kite", kite_temp]]
-    shape=random.choice(shapes)
+    shapes = [[0, triangle_temp],
+              [1, circle_temp],
+              [2, hexagon_temp],
+              [3, pentagon_temp],
+              [4, square_temp],
+              [5, right_triangle_temp],
+              [6, trapeze_temp],
+              [7, rhombus_temp],
+              [8, kite_temp]]
+    shape = random.choice(shapes)
 
     test_puzzle = np.ones((200, 200, 3), np.uint8) * 255
 
@@ -131,10 +133,11 @@ def generate_puzzle():
 def main():
     test_puzzle,shape = generate_puzzle()
     os.makedirs("./test_puzzle_dataset/images")
-    amount_examples_train_dataset = 80
-    amount_examples_test_dataset = 20
-    create_sub_dataset('train',amount_examples_train_dataset,0)
-    create_sub_dataset('test',amount_examples_test_dataset,amount_examples_train_dataset)
+    amount_examples_train_dataset = 800
+    amount_examples_test_dataset = 200
+    count=0
+    count = create_sub_dataset('train',amount_examples_train_dataset,0,count)
+    count = create_sub_dataset('test',amount_examples_test_dataset,amount_examples_train_dataset,count)
 
 
 if __name__ == '__main__':
