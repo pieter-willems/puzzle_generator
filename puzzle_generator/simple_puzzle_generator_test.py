@@ -241,8 +241,8 @@ def build_puzzle():
 
 def main():
     os.makedirs("./simple_puzzle_dataset_test/images")
-    amount_examples_train_dataset = 80
-    amount_examples_test_dataset = 20
+    amount_examples_train_dataset = 200
+    amount_examples_test_dataset = 50
     create_cut_sub_dataset('train', amount_examples_train_dataset, 0)
     create_cut_sub_dataset('test', amount_examples_test_dataset, amount_examples_train_dataset)
 

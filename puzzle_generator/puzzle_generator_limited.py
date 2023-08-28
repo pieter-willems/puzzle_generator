@@ -8,14 +8,8 @@ All_black=False
 
 def create_cut_sub_dataset(name,amount,starting_number,shape_shift,colour_shift,transpose_shape,transpose_colour,same_shape,same_colour,shapes_colors_connected):
     with open('./dataset/' + name + '.csv', 'w') as csv_file:
-
-
-
         fieldnames = ["top_left","top_middle","top_right","middle_left","middle_middle","middle_right",
                       "bottom_left","bottom_middle","shape","colour"]
-
-
-
         csv_writer= csv.DictWriter(csv_file, fieldnames=fieldnames)
         csv_writer.writeheader()
         i = starting_number
@@ -185,10 +179,9 @@ def draw_puzzle(shape_matrix,colour_matrix):
 
 def build_puzzle(shape_shift,colour_shift,transpose_shape,transpose_colour,same_shape,same_colour,shapes_colors_connected):
 
-    colour_palette = {"red": [0, 0, 255], "yellow": [0, 255, 255], "green": [0, 255, 0]
-        , "cyan": [255, 255, 0], "blue": [255, 0, 0], "magenta": [255, 0, 255]}
+    colour_palette = {"red": [0, 0, 255], "yellow": [0, 255, 255], "green": [0, 255, 0]}
 
-    x = random.randrange(3)
+    x = random.randrange(2)
     # one third of the time all the colours are the same
     if x == 2 and same_colour:
         colour = random.sample(colour_palette.keys(), 1)
@@ -277,14 +270,7 @@ def build_puzzle(shape_shift,colour_shift,transpose_shape,transpose_colour,same_
     #choose random order of random shapes
     shapes=[["triangle",triangle_temp],
              ["circle",circle_temp],
-             ["hexagon",hexagon_temp],
-              ["pentagon",pentagon_temp],
-              ["square",square_temp],
-              ["right_triangle",right_triangle_temp],
-              ["trapeze",trapeze_temp],
-              ["rhombus",rhombus_temp],
-              ["kite",kite_temp]
-            ]
+             ["square",square_temp]]
     shapes=random.sample(shapes,3)
     shape_order=[]
     i=0
@@ -292,7 +278,7 @@ def build_puzzle(shape_shift,colour_shift,transpose_shape,transpose_colour,same_
         shape_order.append(shapes[i][1])
         i+=1
     if( not shapes_colors_connected):
-        x = random.randrange(3)
+        x = random.randrange(2)
     shape_matrix=np.ndarray((3,3,200,200,3))
     #make all the shapes in the shape matrix the same 1/3 of the time
     if(x==2 and same_shape):
@@ -343,14 +329,13 @@ def build_puzzle(shape_shift,colour_shift,transpose_shape,transpose_colour,same_
 def main():
 
     #when set to true an example will be generated and displayed
-    show_example = True
+    show_example = False
 
     #settings for creating a dataset, if create_dataset is true a dataset will be created.
     #there is also the possibility of choosing how many training examples and test examples are generated.
-    create_dataset = False
-    amount_examples_train_dataset = 800
-    amount_examples_test_dataset = 200
-
+    create_dataset = True
+    amount_examples_train_dataset = 200
+    amount_examples_test_dataset = 50
 
 
     #settings adjusting what kind of puzzles can be generated

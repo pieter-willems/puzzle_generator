@@ -4,6 +4,8 @@ import cv2
 import csv
 import os
 
+#set to true if you want the solution to be connected in the dataset
+Connected_solution=True
 def cut_puzzle(puzzle):
     tl=puzzle[0:200,0:200]
     bl= puzzle[200:400,0:200]
@@ -12,7 +14,10 @@ def cut_puzzle(puzzle):
 
 def create_cut_sub_dataset(name,amount,starting_number):
     with open('./simple_puzzle_dataset/' + name + '.csv', 'w') as csv_file:
-        fieldnames = ["top_left","top_right","bottom_left","solution"]
+        if Connected_solution:
+            fieldnames = ["top_left","top_right","bottom_left","solution"]
+        else:
+            fieldnames = ["top_left", "top_right", "bottom_left", "shape","colour"]
         csv_writer= csv.DictWriter(csv_file, fieldnames=fieldnames)
         csv_writer.writeheader()
         i = starting_number
@@ -21,7 +26,7 @@ def create_cut_sub_dataset(name,amount,starting_number):
             if at_sample % 25 == 0:
                 print(f"\rAt sample {at_sample} of {amount}...", end='', flush=True)
             puzzle, shape_name,colour_name = build_puzzle()
-            solution = colour_name +'_'+ shape_name
+
             tl,tr,bl=cut_puzzle(puzzle)
             tl_img = "puzzle_" + str(i) + "_tl"
             tr_img= "puzzle_" + str(i) + "_tr"
@@ -29,7 +34,11 @@ def create_cut_sub_dataset(name,amount,starting_number):
             cv2.imwrite("simple_puzzle_dataset/images/" + tl_img + ".png", np.squeeze(tl))
             cv2.imwrite("simple_puzzle_dataset/images/" + tr_img + ".png", np.squeeze(tr))
             cv2.imwrite("simple_puzzle_dataset/images/" + bl_img + ".png", np.squeeze(bl))
-            csv_writer.writerow({"top_left": tl_img,"top_right": tr_img,"bottom_left":bl_img, "solution": solution})
+            if Connected_solution:
+                solution = colour_name + '_' + shape_name
+                csv_writer.writerow({"top_left": tl_img,"top_right": tr_img,"bottom_left":bl_img, "solution": solution})
+            else:
+                csv_writer.writerow({"top_left": tl_img, "top_right": tr_img, "bottom_left": bl_img, "shape": shape_name,"colour":colour_name})
             i += 1
         print(f"\rAt sample {at_sample} of {amount}...", end='', flush=True)
 
@@ -202,8 +211,8 @@ def build_puzzle():
 
 def main():
     os.makedirs("./simple_puzzle_dataset/images")
-    amount_examples_train_dataset = 800
-    amount_examples_test_dataset = 200
+    amount_examples_train_dataset = 200
+    amount_examples_test_dataset = 50
     create_cut_sub_dataset('train', amount_examples_train_dataset, 0)
     create_cut_sub_dataset('test', amount_examples_test_dataset, amount_examples_train_dataset)
 

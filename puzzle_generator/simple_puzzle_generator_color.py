@@ -4,6 +4,8 @@ import cv2
 import csv
 import os
 
+#set to true if you want the solution to be connected in the dataset
+Connected_solution=True
 def cut_puzzle(puzzle):
     tl=puzzle[0:200,0:200]
     bl= puzzle[200:400,0:200]
@@ -112,7 +114,7 @@ def build_puzzle():
     colour_palette = {"red": [0,0,255], "yellow": [0,255,255],"green" : [0,255,0], "cyan":[255,255,0],
                      "blue" : [255,0,0], "magenta": [255,0,255]}
     #colour_palette=[[0,0,255],[0,255,255],[0,255,0],[255,255,0],[255,0,0],[255,0,255]]
-    x=random.randrange(2)
+    x=random.randrange(3)
     #one third of the time all the colours are the same
     if x==2:
         colour=random.sample(colour_palette.keys(),1)
@@ -213,7 +215,7 @@ def build_puzzle():
         shape_order.append(shapes[i][1])
         i += 1
     shape_matrix = np.ndarray((2, 2, 200, 200, 3))
-    x = random.randrange(2)
+    x = random.randrange(3)
 
     #one third of the time all the shapes are the same
     if x==2:
